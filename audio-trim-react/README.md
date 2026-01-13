@@ -1,40 +1,49 @@
-# Authentication Frontend
+# Audio Trim Frontend
 
-This is a React TypeScript frontend for a complete authentication system. It connects to a Go backend API and supports registration, login, single active session, password change, forgot password, and reset password via email link.
+This is a **React + TypeScript frontend** for an **Audio Trimming / Conversion system**.
+It provides a UI to upload audio files, send them to a backend for processing, track job status, and download the trimmed audio.
 
-The app includes protected routes, Axios interceptor for JWT handling, and light/dark theme support.
-
+The frontend communicates with a **Go (Gin) backend API** using JWT-based authentication.
 
 ## Features
 
-* User signup and login
-* JWT-based authentication
-* Single active login (backend supported)
-* Forgot password (email token)
-* Reset password
-* Change password when logged in
-* Protected dashboard
+* Upload files (mp4, wav, etc.)
+* Multiple files upload support
+* Drag & drop file upload
+* Send audio for backend processing
+* Job-based processing with status tracking
+* Download processed audio files
+* Protected routes (JWT required)
 * Axios API service with interceptor
-* Environment-based API URL
-* Light / Dark theme toggle
+* Light / Dark theme support
+* Error boundary handling
+
+## Tech Stack
+
+* React
+* TypeScript
+* Vite
+* Axios
+* Bun
+* HTML5 Audio API
 
 ## Project Structure
 
 ```
 src/
  ├─ api/
- │   └─ api.ts
+ │   └─ api.ts              # Axios instance & audio APIs
  ├─ components/
- │   ├─ Login.tsx
- │   ├─ Register.tsx
- │   ├─ Dashboard.tsx
- │   ├─ ChangePassword.tsx
- │   ├─ ForgotPassword.tsx
- │   └─ ResetPassword.tsx
+ │   ├─ AudioTrim.tsx       # Main audio trim UI
+ │   ├─ UploadAudio.tsx     # File upload
+ │   ├─ AudioPlayer.tsx     # Audio preview
+ │   ├─ Loader.tsx          # Loading indicator
+ │   └─ ThemeToggle.tsx
+ ├─ layouts/
+ │   └─ AppLayout.tsx
  ├─ routes/
- │   └─ App.tsx
- ├─ context/
- │   └─ ThemeContext.tsx
+ │   ├─ ProtectedRoute.tsx
+ │   └─ AdminRoute.tsx
  ├─ styles/
  │   └─ global.css
  ├─ main.tsx
@@ -45,20 +54,21 @@ src/
 
 * Node.js (LTS recommended)
 * bun
-* Running backend API (Go)
+* Running Go backend (Audio API)
+* Valid JWT token (login handled elsewhere)
 
 ## Environment Variables
 
-Create `.env` in the frontend root:
+Create a `.env` file in the frontend root:
 
-```
+```env
 VITE_API_URL=http://localhost:8080
 ```
 
-Optional additional values:
+Optional:
 
-```
-VITE_APP_NAME=Auth System
+```env
+VITE_APP_NAME=Audio Trim
 ```
 
 ## Install Dependencies
@@ -67,49 +77,33 @@ VITE_APP_NAME=Auth System
 bun install
 ```
 
----
-
-## Run the Development Server
+## Run Development Server
 
 ```bash
 bun run dev
 ```
 
-Open browser at:
+Open in browser:
 
 ```
-http://localhost:5173
+http://localhost:5173/audio
 ```
 
-## How Authentication Works
+## How Audio Trimming Works
 
-* user logs in
-* backend generates JWT
-* token stored in `localStorage`
-* Axios interceptor attaches token to each request
-* protected routes verify token
-* logout clears token
-* single active login handled in backend database
-
-## Theming
-
-* theme values defined in `global.css`
-* light/dark stored in document attribute
-* toggle implemented using React context
+1. User navigates to `/audio`
+2. Uploads an audio file
+3. Frontend sends file to backend
+4. Backend creates a processing job
+5. Frontend polls job status
+6. Once completed, user downloads processed audio
 
 ## API Endpoints Used
 
-| Action          | Method | Endpoint                 |
-| --------------- | ------ | ------------------------ |
-| Signup          | POST   | `/signup`                |
-| Login           | POST   | `/login`                 |
-| Change password | POST   | `/change-password`       |
-| Forgot password | POST   | `/forgot-password`       |
-| Reset password  | POST   | `/reset-password/:token` |
+> All endpoints require **JWT authentication**
 
-## Notes
-
-* Make sure backend CORS allows `http://localhost:5173`
-* Use correct `VITE_API_URL`
-* Do not expose SMTP credentials in frontend
-* Keep JWT in `localStorage` or `cookie` depending on security policy
+| Action               | Method | Endpoint             |
+| -------------------- | ------ | -------------------- |
+| Convert / Trim audio | POST   | `/auth/convert`      |
+| Job status           | GET    | `/auth/jobs/:id`     |
+| Download result      | GET    | `/auth/download/:id` |
