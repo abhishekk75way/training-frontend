@@ -1,5 +1,4 @@
-/* Container */
-.audio-container {
+.audio-page {
   min-height: 80vh;
   display: flex;
   align-items: center;
@@ -7,116 +6,150 @@
   padding: 1rem;
 }
 
-/* Card */
 .audio-card {
   background: var(--card-bg);
   padding: 2rem 2.5rem;
   width: 100%;
-  max-width: 420px;
+  max-width: 450px;
   border-radius: 10px;
   box-shadow: 0 10px 25px var(--shadow);
+  color: var(--text);
 }
 
-/* Title */
-.audio-title {
+.audio-card h1 {
   text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--subtext);
+  font-size: 0.95rem;
   margin-bottom: 1.5rem;
-  color: var(--text);
-  font-size: 1.6rem;
 }
 
-/* Input group */
-.audio-group {
-  margin-bottom: 1rem;
-}
-
-/* Labels */
-.audio-group label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-size: 0.9rem;
-  color: var(--subtext);
-}
-
-/* Inputs */
-.audio-group input {
-  width: 100%;
-  padding: 0.7rem;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  font-size: 0.95rem;
-  background: var(--card-bg);
-  color: var(--text);
-  box-sizing: border-box;
-}
-
-.audio-group input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 5px var(--primary-hover);
-}
-
-/* File input */
-.audio-file {
-  margin-bottom: 1rem;
-  color: var(--text);
-}
-
-/* Button */
-.audio-button {
-  width: 100%;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.audio-button:hover {
-  background: var(--primary-hover);
-}
-
-.audio-button:disabled {
-  background: var(--border);
-  cursor: not-allowed;
-}
-
-/* Status text */
-.audio-status {
-  margin-top: 1rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--subtext);
-}
-
-/* Error */
-.audio-error {
-  color: var(--error);
-  font-size: 0.95rem;
-  text-align: center;
-  margin-top: 0.5rem;
-}
-
-.audio-back-button {
-  background: transparent;
+/* Back button */
+.back-btn {
+  background: none;
   border: none;
   color: var(--primary);
   font-size: 0.9rem;
   cursor: pointer;
   margin-bottom: 10px;
+}
+
+/* Dropzone */
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.25s;
+  position: relative;
+  background: transparent;
+}
+
+.dropzone.active {
+  border-color: var(--primary);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+:root[data-theme="dark"] .dropzone.active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dropzone input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dropzone span {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dropzone small {
+  color: var(--subtext);
+  font-size: 0.85rem;
+}
+
+/* File list */
+.file-list {
+  margin-top: 1rem;
   text-align: left;
-  padding: 0;
 }
 
-.audio-button.success {
-  background-color: #16a34a;
+.file-item {
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.04);
+  margin-bottom: 5px;
+  font-size: 0.85rem;
 }
 
-.audio-button.success:hover {
-  background-color: #15803d;
+:root[data-theme="dark"] .file-item {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.duration {
+  font-size: 0.85rem;
+  color: var(--subtext);
+  margin-top: 5px;
+}
+
+/* Buttons */
+.primary-btn,
+.success-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.25s, transform 0.1s;
+}
+
+.primary-btn {
+  background: var(--primary);
+  color: white;
+}
+
+.primary-btn:hover {
+  background: var(--primary-hover);
+}
+
+.success-btn {
+  background: var(--primary);
+  color: white;
+}
+
+.success-btn:hover {
+  background: var(--primary-hover);
+}
+
+.primary-btn:active,
+.success-btn:active {
+  transform: scale(0.97);
+}
+
+/* Status */
+.status {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Error */
+.error {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: center;
 }

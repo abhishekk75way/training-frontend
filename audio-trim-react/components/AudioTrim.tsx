@@ -12,8 +12,8 @@ const AudioTrim = () => {
   const navigate = useNavigate();
 
   const [files, setFiles] = useState<File[]>([]);
-  const [start, setStart] = useState(0);
-  const [end, setEnd] = useState(7);
+  const [duration, setDuration] = useState<number | null>(null);
+  const [dragActive, setDragActive] = useState(false);
 
   const [jobId, setJobId] = useState<string | null>(null);
   const [job, setJob] = useState<Job | null>(null);
@@ -29,35 +29,51 @@ const AudioTrim = () => {
     };
   }, []);
 
-  const handleConvert = async () => {
+  const extractDuration = (file: File): Promise<number> =>
+    new Promise((resolve, reject) => {
+      const el = document.createElement(
+        file.type.startsWith("video") ? "video" : "audio"
+      );
+      el.preload = "metadata";
+      el.src = URL.createObjectURL(file);
+
+      el.onloadedmetadata = () => {
+        URL.revokeObjectURL(el.src);
+        resolve(Math.floor(el.duration));
+      };
+
+      el.onerror = () => reject();
+    });
+
+  const handleFiles = async (list: File[]) => {
     setError("");
+    setFiles(list);
 
-    if (files.length === 0) {
-      setError("Please select at least one file");
-      return;
+    try {
+      const d = await extractDuration(list[0]);
+      setDuration(d);
+    } catch {
+      setError("Unable to read media duration");
     }
+  };
 
-    if (end <= start) {
-      setError("End time must be greater than start time");
-      return;
-    }
+  const handleConvert = async () => {
+    if (files.length === 0) return setError("Please upload files");
+
+    if (!duration || duration <= 0)
+      return setError("Invalid media duration");
 
     const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
-    formData.append("start_time", start.toString());
-    formData.append("end_time", end.toString());
+    files.forEach((f) => formData.append("files", f));
+    formData.append("start_time", "0");
+    formData.append("end_time", duration.toString());
 
     try {
       setLoading(true);
-
       const res = await convertAudio(formData);
+
       setJobId(res.data.job_id);
-
-      setJob({
-        ID: res.data.job_id,
-        Status: "queued",
-      });
-
+      setJob({ ID: res.data.job_id, Status: "queued" });
       pollJob(res.data.job_id);
     } catch {
       setLoading(false);
@@ -69,16 +85,14 @@ const AudioTrim = () => {
     pollRef.current = window.setInterval(async () => {
       try {
         const res = await getJobStatus(id);
-        const updatedJob = res.data;
+        setJob(res.data);
 
-        setJob(updatedJob);
-
-        if (updatedJob.Status === "completed") {
+        if (res.data.Status === "completed") {
           clearInterval(pollRef.current!);
           setLoading(false);
         }
 
-        if (updatedJob.Status === "failed") {
+        if (res.data.Status === "failed") {
           clearInterval(pollRef.current!);
           setLoading(false);
           setError("Processing failed");
@@ -95,94 +109,92 @@ const AudioTrim = () => {
     if (!jobId) return;
 
     const res = await downloadResult(jobId);
-
     const blob = new Blob([res.data], {
       type: res.headers["content-type"],
     });
 
     const url = URL.createObjectURL(blob);
-
-    const filename =
+    const name =
       res.headers["content-type"] === "application/zip"
         ? "audios.zip"
         : "trimmed_audio.mp3";
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
+    a.download = name;
     a.click();
-    a.remove();
-
     URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="audio-container">
+    <div className="audio-page">
       <div className="audio-card">
-        <button className="audio-back-button" onClick={() => navigate("/")}>
-          ← Back to Dashboard
+        <button className="back-btn" onClick={() => navigate("/")}>
+          ← Dashboard
         </button>
 
-        <h2 className="audio-title">Audio Trimming</h2>
+        <h1>Audio Trimming</h1>
+        <p className="subtitle">
+          Upload audio or video files. Audio will be extracted automatically.
+        </p>
 
-        <input
-          className="audio-file"
-          type="file"
-          accept="audio/*,video/*"
-          multiple
-          onChange={(e) =>
-            setFiles(e.target.files ? Array.from(e.target.files) : [])
-          }
-        />
-
-        <div className="audio-group">
-          <label>Start Time (seconds)</label>
+        <div
+          className={`dropzone ${dragActive ? "active" : ""}`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragActive(true);
+          }}
+          onDragLeave={() => setDragActive(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragActive(false);
+            handleFiles(Array.from(e.dataTransfer.files));
+          }}
+        >
           <input
-            type="number"
-            min={0}
-            value={start}
-            onChange={(e) => setStart(Number(e.target.value))}
+            type="file"
+            multiple
+            accept="audio/*,video/*"
+            onChange={(e) =>
+              handleFiles(e.target.files ? Array.from(e.target.files) : [])
+            }
           />
+          <span>Drag & drop files here</span>
+          <small>or click to browse</small>
         </div>
 
-        <div className="audio-group">
-          <label>End Time (seconds)</label>
-          <input
-            type="number"
-            min={0}
-            value={end}
-            onChange={(e) => setEnd(Number(e.target.value))}
-          />
-        </div>
+        {files.length > 0 && (
+          <div className="file-list">
+            {files.map((f) => (
+              <div key={f.name} className="file-item">
+                {f.name}
+              </div>
+            ))}
+            <div className="duration">
+              Duration detected: {duration}s
+            </div>
+          </div>
+        )}
 
         {!job && (
           <button
-            className="audio-button"
+            className="primary-btn"
             onClick={handleConvert}
             disabled={loading}
           >
-            {loading ? "Uploading..." : "Trim Audio"}
+            {loading ? "Uploading..." : "Convert"}
           </button>
         )}
 
-        {job && (
-          <p className="audio-status">
-            Status: <strong>{job.Status}</strong>
-          </p>
-        )}
+        {job && <div className="status">Status: {job.Status}</div>}
 
         {job?.Status === "completed" && (
-          <button className="audio-button success" onClick={handleDownload}>
-            ⬇ Download {files.length > 1 ? "ZIP" : "Audio"}
+          <button className="success-btn" onClick={handleDownload}>
+            Download {files.length > 1 ? "ZIP" : "Audio"}
           </button>
         )}
 
-        {job?.Status === "failed" && (
-          <p className="audio-error">Processing failed due to may your file doesn't contain audio!</p>
-        )}
-
-        {error && <p className="audio-error">{error}</p>}
+        {error && <div className="error">{error}</div>}
       </div>
     </div>
   );
