@@ -1,0 +1,55 @@
+.toggle-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 4px;
+  margin-top: 2px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* hide checkbox */
+.toggle-checkbox {
+  display: none;
+}
+
+/* track */
+.toggle-track {
+  width: 40px;
+  height: 20px;
+  border-radius: 20px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggle-track.light {
+  background: #ccc;
+}
+
+.toggle-track.dark {
+  background: #333;
+}
+
+/* thumb */
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.2s;
+}
+
+.toggle-thumb.light {
+  left: 2px;
+}
+
+.toggle-thumb.dark {
+  left: 20px;
+}
+
+/* icon */
+.toggle-icon {
+  font-size: 16px;
+}

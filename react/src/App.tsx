@@ -11,13 +11,24 @@ import ResetPassword from "../components/ResetPassword";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AuthLayout from "./layouts/AuthLayout";
 import AppLayout from "./layouts/AppLayout";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { loadTheme } from "./theme";
 import ThemeToggle from "../components/ThemeToggle";
 import ErrorBoundary from "./context/ErrorBoundary";
 import AdminRoute from "./routes/AdminRoute";
+import Logout from "../components/Logout"
+import { isAuthenticated } from "./utils/auth";
 
 function App() {
+    const [auth, setAuth] = useState<boolean>(isAuthenticated());
+
+  useEffect(() => {
+    const handler = () => setAuth(isAuthenticated());
+    window.addEventListener("auth-changed", handler);
+
+    return () => window.removeEventListener("auth-changed", handler);
+  }, []);
+
   useEffect(() => {
     loadTheme();
   }, []);
@@ -25,10 +36,9 @@ function App() {
   return (
     <ErrorBoundary>
       <Router>
-        <h3 className="heading">Complete Authentication System</h3>
-
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "right" }}>
           <ThemeToggle />
+          {auth && <Logout />}
         </div>
 
         <Routes>

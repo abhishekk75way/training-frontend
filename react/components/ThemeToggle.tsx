@@ -1,21 +1,26 @@
 import { useTheme } from "../src/context/ThemeContext";
+import "../src/styles/toggle.css"
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <button
-      onClick={toggleTheme}
-      style={{
-        padding: "8px 12px",
-        borderRadius: "6px",
-        border: "none",
-        cursor: "pointer",
-        marginBottom: "10px",
-      }}
-    >
-      {theme === "light" ? "Switch to Dark" : "Switch to Light"}
-    </button>
+    <label className="toggle-container">
+      <input
+        type="checkbox"
+        checked={theme === "dark"}
+        onChange={toggleTheme}
+        className="toggle-checkbox"
+      />
+
+      <span className={`toggle-track ${theme === "dark" ? "dark" : "light"}`}>
+        <span className={`toggle-thumb ${theme === "dark" ? "dark" : "light"}`} />
+      </span>
+
+      <span className="toggle-icon">
+        {theme === "dark" ? "🌜" : "🌞"}
+      </span>
+    </label>
   );
 };
 

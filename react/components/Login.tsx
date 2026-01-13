@@ -30,6 +30,7 @@ export default function LoginForm() {
     const token = res.data.token;
 
     localStorage.setItem("token", token);
+    window.dispatchEvent(new Event("auth-changed"));
 
     const payload = decodeToken(token);
     console.log("JWT PAYLOAD:", payload.role);

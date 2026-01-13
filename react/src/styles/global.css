@@ -38,7 +38,7 @@ body {
 }
 
 .auth-container {
-  min-height: 50vh;
+  min-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,7 +128,7 @@ body {
 }
 
 .dashboard-container {
-  min-height: 50vh;
+  min-height: 75vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,3 +177,22 @@ body {
   background: var(--primary-hover);
 }
 
+.logout-button {
+  padding: 8px 14px;
+  margin: 0px 5px 0 5px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #e74c3c;
+  color: white;
+  font-size: 14px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.logout-button:hover {
+  background: #c0392b;
+}
+
+.logout-button:active {
+  transform: scale(0.96);
+}
