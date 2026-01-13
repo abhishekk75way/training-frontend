@@ -73,6 +73,7 @@ const AudioTrim = () => {
             const res = await convertAudio(formData);
 
             setJob({ ID: res.data.job_id, Status: "queued" });
+            setJobId(res.data.job_id);
 
             setTimeout(() => {
                 setJob((prev) => prev ? { ...prev, Status: "processing" } : prev);
@@ -127,7 +128,10 @@ const AudioTrim = () => {
         const a = document.createElement("a");
         a.href = url;
         a.download = name;
+        document.body.appendChild(a);
         a.click();
+        a.remove();
+
         URL.revokeObjectURL(url);
     };
 
